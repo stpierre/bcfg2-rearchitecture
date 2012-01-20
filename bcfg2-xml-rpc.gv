@@ -1,0 +1,44 @@
+digraph bcfg2 {
+    label = "Rearchitecture Overview - XML-RPC Request";
+    node [style="filled"]
+    compound = true;
+    
+    "master1" [shape = "record",
+               label = "Master server | SSL | Authentication"];
+
+    subgraph cluster_amqp {
+        label = "AMQP";
+        "xml-rpc-any-q" [label = "XML-RPC One-to-Any Queue"];
+        "xml-rpc-all-q" [label="XML-RPC One-to-All Queue"];
+    }
+
+    subgraph cluster_renderers {
+        label = "Configuration Renderers";
+        "renderer1" [label = "Renderer 1"];
+        "renderer2" [label = "Renderer 2"];
+        "renderer3" [label = "Renderer 3"];
+    }
+
+    "db1" [label = "SQL Database"];
+    "vcs" [label = "VCS"];
+
+    // content system communications
+    "vcs" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "vcs" [ltail=cluster_renderers];
+    "db1" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "db1" [ltail=cluster_renderers];
+
+    // queue for one-to-any RMI
+    "master1" -> "xml-rpc-any-q" [label="One-to-Any XML-RPC requests"];
+    "xml-rpc-any-q" -> "master1";
+    "xml-rpc-any-q" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "xml-rpc-any-q" [ltail=cluster_renderers];
+
+    // queue for one-to-all RMI
+    "master1" -> "xml-rpc-all-q" [label="One-to-All XML-RPC requests"];
+    "xml-rpc-all-q" -> "master1";
+    "xml-rpc-all-q" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "xml-rpc-all-q" [ltail=cluster_renderers];
+
+    "XML-RPC request" -> "master1" [ label="Encrypted 6789/tcp" ];
+}

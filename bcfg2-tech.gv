@@ -1,0 +1,24 @@
+digraph bcfg2 {
+    label = "Rearchitecture Overview - Technologies";
+    node [style="filled"];
+    compound = true;
+    
+    "master" [shape = "record",
+              label = "Master server | WSGI via Apache or Nginx"];
+
+    "sql" [label = "Supported SQL Database"];
+    "vcs" [label = "Supported VCS"];
+
+    "renderer" [shape = "record",
+                label = "Configuration Renderers | Custom Daemon"];
+    "stats" [shape = "record",
+             label = "Statistics Processors | Custom Daemon"];
+    "rabbitmq" [shape="record", label="RabbitMQ"];
+
+    "sql" -> "renderer" [label="SQL"];
+    "sql" -> "stats" [label="SQL"];
+    "vcs" -> "renderer";
+    "renderer" -> "rabbitmq" [label="AMQP"];
+    "stats" -> "rabbitmq" [label="AMQP"];
+    "master" -> "rabbitmq" [label="AMQP"];
+}

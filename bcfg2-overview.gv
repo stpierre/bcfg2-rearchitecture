@@ -1,0 +1,49 @@
+digraph bcfg2 {
+    label = "Rearchitecture Overview - Normal Client Request";
+    node [style="filled"];
+    compound = true;
+    
+    "master1" [shape = "record",
+               label = "Master server | SSL | Authentication"];
+
+    subgraph cluster_rabbitmq {
+        label="AMQP";
+        "stats-q" [label="Statistics Processing Queue"];
+        "config-q" [label="Configuration queue"];
+    }
+
+    subgraph cluster_stats_procs {
+        label = "Statistics Processors";
+        "stats-proc1" [label = "Processor 1"];
+        "stats-proc2" [label = "Processor 2"];
+    }
+
+    subgraph cluster_renderers {
+        label = "Configuration Renderers";
+        "renderer1" [label = "Renderer 1"];
+        "renderer2" [label = "Renderer 2"];
+        "renderer3" [label = "Renderer 3"];
+    }
+
+    "db1" [label = "SQL Database"];
+    "vcs" [label = "VCS"];
+
+    // content system communications
+    "vcs" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "vcs" [ltail=cluster_renderers];
+    "db1" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "db1" [ltail=cluster_renderers];
+
+    // queue for submitting render requests and getting configs
+    "config-q" -> "master1";
+    "master1" -> "config-q";
+    "config-q" -> "renderer2" [lhead=cluster_renderers];
+    "renderer2" -> "config-q" [ltail=cluster_renderers];
+
+    "Client" -> "master1" [ label="Encrypted 6789/tcp" ];
+
+    // statistics processing queue
+    "master1" -> "stats-q";
+    "stats-proc2" -> "db1" [ltail="cluster_stats_procs"];
+    "stats-q" -> "stats-proc1" [lhead=cluster_stats_procs];
+}
