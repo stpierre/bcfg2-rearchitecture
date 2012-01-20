@@ -114,12 +114,14 @@ Normal Client-Server Interaction
 #. Client requests probes from master (6789/tcp)
 #. Master requests probes from configuration queue (5672/tcp). A
    renderer:
+
    #. Builds initial metadata for client
    #. Creates probe set
    #. Returns probes to master (5672/tcp)
 
 #. Master returns probes to client (6789/tcp)
 #. Client:
+
    #. Runs probes
    #. Returns probe data to master (6789/tcp)
 
@@ -128,6 +130,7 @@ Normal Client-Server Interaction
 #. Client requests decision list from master (6789/tcp)
 #. Master requests decision list from configuration queue
    (5672/tcp). A renderer:
+
    #. Builds full metadata for client
    #. Creates decision list
    #. Returns decision list to master (5672/tcp)
@@ -137,6 +140,7 @@ Normal Client-Server Interaction
 #. Master submits configuration render request to configuration queue
    (5672/tcp)
 #. Configuration renderer:
+
    #. Builds full metadata for client
    #. Builds structure list
    #. Validates structures
@@ -157,11 +161,13 @@ XML-RPC
 #. Master determines if XML-RPC request applies to _every_ renderer or
    to _any_ renderer.
 #. If the request is one-to-all:
+
    #. The master routes the request to the XML-RPC queue (5672/tcp).
    #. All renderers process the request.
    #. The master returns ok.
 
 #. If the request is one-to-any:
+
    #. The master routes the request to the configuration render queue
       (5672/tcp).
    #. One renderer processes the request, and submits the results to
